@@ -23,13 +23,25 @@ class SuiseiAidlService : Service() {
         }
     }
 
+    override fun onCreate() {
+        Log.d("suisei service in service", "create suisei service")
+        super.onCreate()
+    }
+
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
+        Log.d("suisei service in service", "start suisei service")
         Toast.makeText(this, "suisei service starting", Toast.LENGTH_SHORT).show()
         return super.onStartCommand(intent, flags, startId)
     }
 
     override fun onBind(intent: Intent): IBinder {
         return binder
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        Log.d("suisei service in service", "stop suisei service")
+        Toast.makeText(this, "suisei service stopped", Toast.LENGTH_SHORT).show()
     }
 
     private fun getRand() : Int {

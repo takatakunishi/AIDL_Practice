@@ -41,6 +41,7 @@ class FirstFragment : Fragment() {
         override fun onServiceDisconnected(componentName: ComponentName?) {
             Toast.makeText(context, "service suisei service is disconnected", Toast.LENGTH_SHORT).show()
             Log.d("suisei", "disconnected")
+            suiseiService = null
         }
     }
 
@@ -88,11 +89,14 @@ class FirstFragment : Fragment() {
         binding.buttonFirst.setOnClickListener{
             bindListenner()
         }
-//        {
-//            bindListenner
-//            changeSuiseiText(view, "今日も小さい〜〜〜！\n「な　ん　だ　っ　て　？」")
-////            findNavController().navigate(R.id.action_FirstFragment_to_SecondFragment)
-//        }
+    }
+
+    override fun onStop() {
+        super.onStop()
+        if (isBound){
+            context?.unbindService(connection)
+        }
+        isBound = false
     }
 
     override fun onDestroyView() {
