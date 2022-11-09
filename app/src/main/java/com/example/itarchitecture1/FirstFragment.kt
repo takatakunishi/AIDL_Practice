@@ -15,6 +15,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.navigation.fragment.findNavController
 import com.example.itarchitecture1.databinding.FragmentFirstBinding
+import com.example.remote_suisei_service.SuiseiInterface
 import java.lang.Error
 
 /**
@@ -27,12 +28,12 @@ class FirstFragment : Fragment() {
     // This property is only valid between onCreateView and
     // onDestroyView.
     private val binding get() = _binding!!
-    private var suiseiService: AidlInterface? = null
+    private var suiseiService: SuiseiInterface? = null
     private var isBound: Boolean = false
 
     private val connection = object : ServiceConnection {
         override fun onServiceConnected(componentName: ComponentName?, service: IBinder?) {
-            suiseiService = AidlInterface.Stub.asInterface(service)
+            suiseiService = SuiseiInterface.Stub.asInterface(service)
             Log.d("suisei in first fragment", "service suisei service is connected")
             getSuiseiWordByServiceAndSetTextView(suiseiService)
             isBound = true
@@ -45,7 +46,7 @@ class FirstFragment : Fragment() {
         }
     }
 
-    private fun getSuiseiWordByServiceAndSetTextView(suiseiService: AidlInterface?){
+    private fun getSuiseiWordByServiceAndSetTextView(suiseiService: SuiseiInterface?){
         try {
             val suiseiWord = suiseiService?.getSuiseiWords()
             Toast.makeText(context, suiseiWord, Toast.LENGTH_SHORT).show()
@@ -62,8 +63,10 @@ class FirstFragment : Fragment() {
     private fun bindListenner(){
         Log.d("suisei", "listener activated")
         if (!isBound) {
-            val intent = Intent(context, SuiseiAidlService::class.java)
-            intent.action = AidlInterface::class.java.name
+            val intent = Intent().also {
+                it.action = "com.example.remote_suisei_service.SUISEI_SERVER"
+                it.`package` = "com.example.remote_suisei_service"
+            }
             if (context == null) {
                 Toast.makeText(context, "in fragment, activity is null", Toast.LENGTH_SHORT).show()
             }
@@ -89,15 +92,19 @@ class FirstFragment : Fragment() {
         binding.buttonFirst.setOnClickListener{
             bindListenner()
         }
+
+        binding.toInputBtn.setOnClickListener {
+            findNavController().navigate(R.id.SecondFragment)
+        }
     }
 
-    override fun onStop() {
-        super.onStop()
-        if (isBound){
-            context?.unbindService(connection)
-        }
-        isBound = false
-    }
+//    override fun onStop() {
+//        super.onStop()
+//        if (isBound){
+//            context?.unbindService(connection)
+//        }
+//        isBound = false
+//    }
 
     override fun onDestroyView() {
         super.onDestroyView()
